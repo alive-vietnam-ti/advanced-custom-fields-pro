@@ -13,5 +13,5 @@ jobs:
       with:
         server: alive-web.site
         username: alivevn
-        password: ${{ secrets.alivevn_password }}
+        password: ${{ secrets.ALIVEVN_PASSWORD }}
         server-dir: public_html/github/advanced-custom-fields-pro/
