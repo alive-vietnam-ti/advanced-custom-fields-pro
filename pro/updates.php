@@ -91,8 +91,9 @@ if ( ! class_exists( 'acf_pro_updates' ) ) :
 		function modify_plugin_update_message( $plugin_data, $response ) {
 
 			// bail early if has key
-
+			if ( acf_pro_get_license_key() ) {
 				return;
+			}
 
 			// display message
 			echo '<br />' . sprintf( __( 'To enable updates, please enter your license key on the <a href="%1$s">Updates</a> page. If you don\'t have a licence key, please see <a href="%2$s" target="_blank">details & pricing</a>.', 'acf' ), admin_url( 'edit.php?post_type=acf-field-group&page=acf-settings-updates' ), 'https://www.advancedcustomfields.com/pro/?utm_source=ACF%2Bpro%2Bplugin&utm_medium=insideplugin&utm_campaign=ACF%2Bupgrade&utm_content=updates' );
@@ -294,15 +295,20 @@ function acf_pro_display_activation_error() {
 function acf_pro_get_license() {
 
 	// get option
-	$license = array('key'=>'marcost96','url'=>home_url());
+	$license = get_option( 'acf_pro_license' );
 
-
+	// bail early if no value
+	if ( ! $license ) {
+		return false;
+	}
 
 	// decode
-
+	$license = maybe_unserialize( base64_decode( $license ) );
 
 	// bail early if corrupt
-
+	if ( ! is_array( $license ) ) {
+		return false;
+	}
 
 	// return
 	return $license;
@@ -320,18 +326,25 @@ function acf_pro_get_license() {
  *  @param   boolean $skip_url_check Skip the check of the current site url.
  *  @return  string $license_key
  */
-function acf_pro_get_license_key() {
+function acf_pro_get_license_key( $skip_url_check = false ) {
 
 	// vars
 	$license  = acf_pro_get_license();
 	$home_url = home_url();
 
 	// bail early if empty
+	if ( ! $license || ! $license['key'] ) {
+		return false;
+	}
 
 	// bail early if url has changed
+	if ( ! $skip_url_check && acf_strip_protocol( $license['url'] ) !== acf_strip_protocol( $home_url ) ) {
+		return false;
+	}
 
 	// return
-	return 'marcost96';
+	return $license['key'];
+
 }
 
 
@@ -348,18 +361,21 @@ function acf_pro_get_license_key() {
 function acf_pro_update_license( $key = '' ) {
 
 	// vars
-	$value = 'marcost96';
+	$value = '';
+
 	// key
+	if ( $key ) {
 
 		// vars
 		$data = array(
-			'key'	=> 'marcost96',
-			'url'	=> home_url()
+			'key' => $key,
+			'url' => home_url(),
 		);
 
 		// encode
 		$value = base64_encode( maybe_serialize( $data ) );
 
+	}
 
 	// re-register update (key has changed)
 	acf_register_plugin_update(

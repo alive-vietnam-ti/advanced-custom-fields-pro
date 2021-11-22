@@ -149,14 +149,15 @@ if ( ! class_exists( 'ACF_Admin_Updates' ) ) :
 			// vars
 			$license    = acf_pro_get_license_key();
 			$this->view = array(
-				'license'			=> 'marcost96',
-				'active'			=> $license ? 1 : 1,
-				'current_version'	=> acf_get_setting('version'),
-				'remote_version'	=> '',
-				'update_available'	=> false,
-				'changelog'			=> '',
-				'upgrade_notice'	=> '',
-				'is_defined_license' => defined( 'ACF_PRO_LICENSE' ) && ! empty( ACF_PRO_LICENSE ) && is_string( ACF_PRO_LICENSE )
+				'license'            => $license,
+				'active'             => $license ? 1 : 0,
+				'current_version'    => acf_get_setting( 'version' ),
+				'remote_version'     => '',
+				'update_available'   => false,
+				'changelog'          => '',
+				'upgrade_notice'     => '',
+				'is_defined_license' => defined( 'ACF_PRO_LICENSE' ) && ! empty( ACF_PRO_LICENSE ) && is_string( ACF_PRO_LICENSE ),
+				'license_error'      => false,
 			);
 
 			// get plugin updates
